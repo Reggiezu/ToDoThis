@@ -40,8 +40,12 @@ function deleteItem(id){
     return itemList = itemList.filter((item) => item.id !== id);
 }
 
+// .find is not the most efficent
 function addProject(name){
-    return projects.push(name);
+    if(!projects.find((item)=> item === name)){
+        return projects.push(name);
+    }
+    return -1;
 }
 
 function getItemsByProject(projectName){
