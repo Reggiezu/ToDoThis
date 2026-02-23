@@ -1,5 +1,6 @@
 // ToDo List //
 
+// List state functions 
 const toDoList = (function(){
 let projects=["default","Java"]
 let itemList=[{
@@ -18,9 +19,25 @@ function newItem (title,
      project){
     const id = crypto.randomUUID();
     const complete = false;
+    title = titleCleaner(title);
+    if (!priorityChecker(priority)){
+        return {ok: false, error: "Priority is greater than 5 or less than 1"}
+    }
     project = project || "default";
+    addProject(project);
     itemList.push({id, title, description, dueDate, priority,project,complete});
     return {id, title, description, dueDate, priority,project,complete};
+}
+const titleCleaner=(str)=>{
+str =str.toString();
+return str = str.toLowerCase().trim().replace(/\s/g, "")
+}
+const priorityChecker=(priority)=>{
+    priority=Number(priority);
+    if (priority <=0 || priority > 5){
+        return false
+    }
+    return priority
 }
 
 function getList(){
@@ -74,6 +91,7 @@ return{
 
 })();
 
-toDoList.newItem("Cook","Grill ribs and start rice cooker",'08-22-2024', 4)
+toDoList.newItem("  Cook.     .","Grill ribs and start rice cooker",'08-22-2024', 4)
 toDoList.newItem("Eat","Set Plate and chow down",'08-22-2024', 5, "Habits")
+toDoList.newItem("Eat","Set Plate and chow down",'08-22-2024', 90, "Habits")
 
