@@ -1,0 +1,25 @@
+.Card-Holder{
+    display: flex;
+}
+.card{
+display: flex;
+flex-wrap: wrap;
+justify-content: space-around;
+gap: 20px;
+align-items: stretch;
+flex-direction: column;
+border: 1px solid #ccc;
+border-radius: 8px;
+margin: 40px 30px 10px 10px;
+width: 400px;
+}
+
+.cardItem{
+flex: 1 10px 50px;
+display: flex;
+
+}
+
+.hidden {
+     display: none; 
+    }
