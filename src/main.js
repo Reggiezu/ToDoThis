@@ -117,6 +117,7 @@ const addTaskBtn = document.getElementById("add-task-btn")
 const addTaskForm = document.getElementById("new-task-form")
 const closeTaskFormBtn = document.getElementById("close-task-form");
 const submitBtn = document.getElementById("submit-task");
+const projectFilter = document.getElementById("Project-Filter")
 
 
 function validityChecker(){
@@ -139,6 +140,7 @@ submitBtn.addEventListener('click',(e)=>{
     e.preventDefault();
     const taskVal = addTaskForm.querySelector('input[name="completion-status"]:checked')?.value??"";
     if(isValid(validityChecker())){
+        console.log(taskProject.value)
 const newTask =toDoList.newItem(taskTitle.value,taskDescription.value,taskDueDate.value,taskPriority.value,taskProject.value,taskVal)
 saveTasks();
 return addToList(newTask)
@@ -147,8 +149,14 @@ return addToList(newTask)
 }
 
 })
+function clearList(){
+    taskList.innerHTML=""
+}
+toDoList.getProjects().forEach(function(project){
+        getProjectList(project,projectFilter)
+    })
 function renderList() {
-    const list =toDoList.getList();
+    const list =projectFilter.value==="all"? toDoList.getList():toDoList.getItemsByProject(projectFilter.value);
      list.map((task) => taskList.innerHTML +=`<div id="Task-Card-${task.id}" class="card">
             <span id="Task-Title-${task.id}" class="cardItem"><strong>Title: </strong> ${task.title} </span>
             <p id="Task-Description-${task.id}" class="cardItem"><strong>Description: </strong> ${task.description}</p>
@@ -181,7 +189,12 @@ taskList.addEventListener('click', function(event){
         console.log(taskId)
 
         deleteListItem(taskId)
+        
 
+})
+projectFilter.addEventListener('change',(e)=>{
+clearList();
+renderList();
 })
 function closeTaskForm() {
   addTaskForm.reset();
