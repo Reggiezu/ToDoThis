@@ -2,7 +2,7 @@
 
 // ***List state functions*** 
 const toDoList = (function(){
-let projects=["default","Java"]
+let projects=[]
 let itemList=[];
 function newItem (title,
      description,
@@ -16,10 +16,7 @@ function newItem (title,
         return {ok: false, error: "Priority is greater than 5 or less than 1"}
     }
     project = project || "default";
-    if(!getProjects(titleCleaner(project))){
-    addProject(project);
-    }
-
+    addProject(titleCleaner(project));
     itemList.push({id, title, description, dueDate, priority,project,complete});
     return {id, title, description, dueDate, priority,project,complete};
 }
@@ -43,6 +40,9 @@ function setList(list){
 }
 function getProjects(){
     return projects;
+}
+function setProjects(list){
+    return projects=list
 }
 // will change from always true to a toggle system between true and false. 
 function completeItem(id){
@@ -80,6 +80,7 @@ return{
     getList,
     setList,
     getProjects,
+    setProjects,
     deleteItem,
     addProject,
     getItemsByProject,
@@ -102,6 +103,16 @@ function loadTasks(){
 function saveTasks(){
    localStorage.setItem("tasks", JSON.stringify(toDoList.getList()));
 }
+function loadProjects(){
+   const stored = localStorage.getItem("projects");
+   if(stored){
+      const parsed = JSON.parse(stored);
+      toDoList.setProjects(parsed);
+   }
+}
+function saveProjects(){
+   localStorage.setItem("projects", JSON.stringify(toDoList.getProjects()));
+}
 
 //****Rendering pieces ***
 const taskList = document.getElementById("Item-List")
@@ -118,6 +129,9 @@ const addTaskForm = document.getElementById("new-task-form")
 const closeTaskFormBtn = document.getElementById("close-task-form");
 const submitBtn = document.getElementById("submit-task");
 const projectFilter = document.getElementById("Project-Filter")
+const newProjectName = document.getElementById("new-Project-Name")
+const newProjectNameLabel = document.getElementById("new-Project-Name-Label")
+
 
 
 function validityChecker(){
@@ -139,10 +153,13 @@ function isValid(Obj){
 submitBtn.addEventListener('click',(e)=>{
     e.preventDefault();
     const taskVal = addTaskForm.querySelector('input[name="completion-status"]:checked')?.value??"";
+    const project=newProjectName.value||taskProject.value;
     if(isValid(validityChecker())){
         console.log(taskProject.value)
-const newTask =toDoList.newItem(taskTitle.value,taskDescription.value,taskDueDate.value,taskPriority.value,taskProject.value,taskVal)
+        renderFilterList();
+const newTask =toDoList.newItem(taskTitle.value,taskDescription.value,taskDueDate.value,taskPriority.value,project,taskVal)
 saveTasks();
+saveProjects();
 return addToList(newTask)
 }else{
     return console.log("did not work")
@@ -152,9 +169,11 @@ return addToList(newTask)
 function clearList(){
     taskList.innerHTML=""
 }
-toDoList.getProjects().forEach(function(project){
+function renderFilterList(){
+    toDoList.getProjects().forEach(function(project){
         getProjectList(project,projectFilter)
     })
+}
 function renderList() {
     const list =projectFilter.value==="all"? toDoList.getList():toDoList.getItemsByProject(projectFilter.value);
      list.map((task) => taskList.innerHTML +=`<div id="Task-Card-${task.id}" class="card">
@@ -173,24 +192,33 @@ option.value = project;
 option.text=project;
 location.appendChild(option);
 }
+
 addTaskBtn.addEventListener('click',(e)=>{
 e.preventDefault();
 taskCard.classList.remove("hidden");
-console.log("hey");
 toDoList.getProjects().forEach(function(project){
 getProjectList(project,taskProject)
-})});
+})
 
+const option = document.createElement("option");
+    option.value = "add-Project";
+    option.text="+ New Project";
+    taskProject.appendChild(option);
+});
+
+taskProject.addEventListener('change',(e)=>{
+    if(taskProject.value ==="add-Project"){
+newProjectName.classList.remove("hidden");
+newProjectNameLabel.classList.remove("hidden");
+}else if(taskProject.value !=="add-Project" && !newProjectName.classList.contains("hidden")){
+newProjectName.classList.add("hidden");
+newProjectNameLabel.classList.add("hidden");
+}
+})
 taskList.addEventListener('click', function(event){
-        
         const task = event.target.closest('button')
-        console.log(task.id)
         const taskId=task.id.replace("Task-Deletion-", "")
-        console.log(taskId)
-
         deleteListItem(taskId)
-        
-
 })
 projectFilter.addEventListener('change',(e)=>{
 clearList();
@@ -223,8 +251,11 @@ closeTaskFormBtn.addEventListener("click", closeTaskForm);
 function deleteListItem(taskID){
     toDoList.deleteItem(taskID);
     saveTasks();
+    saveProjects();
     return removeFromList(taskID);
 }
 
 loadTasks();
+loadProjects();
 renderList();
+renderFilterList();
