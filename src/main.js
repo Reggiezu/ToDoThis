@@ -3,23 +3,7 @@
 // ***List state functions*** 
 const toDoList = (function(){
 let projects=["default","Java"]
-let itemList=[{
-    id:24,
-    title:"test",
-     description:"Here to test",
-     dueDate:"02-20-2026",
-     priority:3,
-     project:"default",
-     complete:false
-},{
-    id:25,
-    title:"test",
-     description:"Here to test",
-     dueDate:"02-20-2026",
-     priority:3,
-     project:"default",
-     complete:false
-},];
+let itemList=[];
 function newItem (title,
      description,
      dueDate,
@@ -54,6 +38,9 @@ const priorityChecker=(priority)=>{
 function getList(){
     return itemList;
 };
+function setList(list){
+    return itemList=list
+}
 function getProjects(){
     return projects;
 }
@@ -91,6 +78,7 @@ return{
     newItem,
     completeItem,
     getList,
+    setList,
     getProjects,
     deleteItem,
     addProject,
@@ -102,6 +90,18 @@ return{
 
 })();
 
+//*********** Local Storage functions *************
+
+function loadTasks(){
+   const stored = localStorage.getItem("tasks");
+   if(stored){
+      const parsed = JSON.parse(stored);
+      toDoList.setList(parsed);
+   }
+}
+function saveTasks(){
+   localStorage.setItem("tasks", JSON.stringify(toDoList.getList()));
+}
 
 //****Rendering pieces ***
 const taskList = document.getElementById("Item-List")
@@ -140,15 +140,15 @@ submitBtn.addEventListener('click',(e)=>{
     const taskVal = addTaskForm.querySelector('input[name="completion-status"]:checked')?.value??"";
     if(isValid(validityChecker())){
 const newTask =toDoList.newItem(taskTitle.value,taskDescription.value,taskDueDate.value,taskPriority.value,taskProject.value,taskVal)
-addToList(newTask)
+saveTasks();
+return addToList(newTask)
 }else{
-
     return console.log("did not work")
 }
 
 })
 function renderList() {
-    const list = toDoList.getList();
+    const list =toDoList.getList();
      list.map((task) => taskList.innerHTML +=`<div id="Task-Card-${task.id}" class="card">
             <span id="Task-Title-${task.id}" class="cardItem"><strong>Title: </strong> ${task.title} </span>
             <p id="Task-Description-${task.id}" class="cardItem"><strong>Description: </strong> ${task.description}</p>
@@ -159,17 +159,18 @@ function renderList() {
             <button id="Task-Deletion-${task.id}" > Delete Task</button>
         </div>`)
 }
-
+function getProjectList(project,location){
+    const option = document.createElement("option");
+option.value = project;
+option.text=project;
+location.appendChild(option);
+}
 addTaskBtn.addEventListener('click',(e)=>{
 e.preventDefault();
 taskCard.classList.remove("hidden");
 console.log("hey");
 toDoList.getProjects().forEach(function(project){
-const option = document.createElement("option");
-option.value = project;
-option.text=project;
-taskProject.appendChild(option);
-
+getProjectList(project,taskProject)
 })});
 
 taskList.addEventListener('click', function(event){
@@ -180,7 +181,6 @@ taskList.addEventListener('click', function(event){
         console.log(taskId)
 
         deleteListItem(taskId)
-        
 
 })
 function closeTaskForm() {
@@ -209,10 +209,9 @@ closeTaskFormBtn.addEventListener("click", closeTaskForm);
 // **** Controller/Handler ****
 function deleteListItem(taskID){
     toDoList.deleteItem(taskID);
+    saveTasks();
     return removeFromList(taskID);
 }
 
-toDoList.newItem("  Cook.     .","Grill ribs and start rice cooker",'08-22-2024', 4,"Default",false)
-toDoList.newItem("Eat","Set Plate and chow down",'08-22-2024', 5, "Habits",true)
-toDoList.newItem("testingError","My priority is wrong",'08-22-2024', 90, "Habits")
+loadTasks();
 renderList();
