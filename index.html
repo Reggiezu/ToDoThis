@@ -11,23 +11,36 @@
         <h1 id="title">To Do This</h1>
         <h3>A list of tasks I must complete</h3>
     </div>
-    <div id="Item-List" class="Card-Holder">
-        <div id="Task-Card" class="card">
-            <span id="Task-Title" class="cardItem">Item #1 title</span>
-            <p id="Task-Description" class="cardItem">Item Description</p>
-            <p id="Task-DueDate" class="cardItem">Due Date</p>
-            <p id="Task-Priority" class="cardItem">Priority</p>
-            <p id="Task-Project" class="cardItem">Project</p>
-            <p id="Task-Completion" class="cardItem">Completed? </p>
+    <button id="add-task-btn">Add New Task</button>
+    <div id="Task-Card" class="card hidden" >
+            <form id="new-task-form">
+                <label for="title"><strong>Title</strong></label>
+                <input type="text" id="Task-Title" class="cardItem" size="40" required>
+                <label for="Task-Description"><strong>Item Description</strong></label>
+                <input type="text" id="Task-Description" class="cardItem" size="40" required>
+                <label for="Task-DueDate"><strong>Due Date</strong></label>
+                <input type="date" id="Task-DueDate" class="cardItem" size="40" required>
+                <label for="Task-Priority"><strong>Priority</strong></label>
+                <input type="number" id="Task-Priority" class="cardItem" size="50" min="1" max="5" required>
+                <label for="Task-Project"><strong>Project</strong></label>
+                <select id="Task-Project" class="cardItem" required>
+                </select>
+                <div id="Task-Completion-Container">
+                <label for="Task-Completion"><strong> Task Completed?</strong></label>
+                <div id="Task-Completed-Checkbox">
+                <label for="coding">Complete</label>
+                <input type="radio" id="Task-Completed" name="completion-status" value="true">
+                </div>
+                <div id="Task-Incompleted-Checkbox">
+                <label for="coding">Incomplete</label>
+                <input type="radio" id="Task-Incompleted"  name="completion-status" value="false" checked>
+                </div>
+                </div>
+                <button id="submit-task" type="submit">Add Task</button>
+                <button type="button" id="close-task-form">Close</button>
+            </form>
         </div>
-        <div id="Task-Card2" class="card">
-                <span id="Task-Title2" class="cardItem">Item #1 title</span>
-                <p id="Task-Description2" class="cardItem">Item Description</p>
-                <p id="Task-DueDate2" class="cardItem">Due Date</p>
-                <p id="Task-Priority2" class="cardItem">Priority</p>
-                <p id="Task-Project2" class="cardItem">Project</p>
-                <p id="Task-Completion2" class="cardItem">Completed? </p>
-            </div>
+    <div id="Item-List" class="Card-Holder">
     </div>
     
 </body>

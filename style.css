@@ -14,12 +14,13 @@ margin: 40px 30px 10px 10px;
 width: 400px;
 }
 
+
 .cardItem{
 flex: 1 10px 50px;
 display: flex;
 
 }
 
-.hidden {
-     display: none; 
-    }
+.hidden{
+display: none; 
+}

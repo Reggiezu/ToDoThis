@@ -24,15 +24,18 @@ function newItem (title,
      description,
      dueDate,
      priority,
-     project){
+     project,
+     complete){
     const id ="TID-" +crypto.randomUUID();
-    const complete = false;
     title = titleCleaner(title);
     if (!priorityChecker(priority)){
         return {ok: false, error: "Priority is greater than 5 or less than 1"}
     }
     project = project || "default";
+    if(!getProjects(titleCleaner(project))){
     addProject(project);
+    }
+
     itemList.push({id, title, description, dueDate, priority,project,complete});
     return {id, title, description, dueDate, priority,project,complete};
 }
@@ -98,6 +101,8 @@ return{
 };
 
 })();
+
+
 //****Rendering pieces ***
 const taskList = document.getElementById("Item-List")
 const taskCard = document.getElementById("Task-Card")
@@ -108,9 +113,40 @@ const taskPriority = document.getElementById("Task-Priority")
 const taskProject = document.getElementById("Task-Project")
 const taskCompletion = document.getElementById("Task-Completion")
 const delBtn = document.querySelectorAll("button")
+const addTaskBtn = document.getElementById("add-task-btn")
+const addTaskForm = document.getElementById("new-task-form")
+const closeTaskFormBtn = document.getElementById("close-task-form");
+const submitBtn = document.getElementById("submit-task");
 
-console.log("This is the first:" + taskList)
 
+function validityChecker(){
+    const taskVal = addTaskForm.querySelector('input[name="completion-status"]:checked')?.value??"";
+    return{
+        "Task-Title": taskTitle.value !="",
+        "Task-Description":taskDescription.value !="",
+        "Task-DueDate":taskDueDate.checkValidity(taskDueDate.value),
+        "Task-Priority":taskPriority.checkValidity(taskPriority.value),
+        "Task-Project":taskProject.value != "",
+        "Task-Completion":taskVal!=""
+    }
+}
+function isValid(Obj){
+    return Object.values(Obj).every(value=> value == true)
+}
+
+
+submitBtn.addEventListener('click',(e)=>{
+    e.preventDefault();
+    const taskVal = addTaskForm.querySelector('input[name="completion-status"]:checked')?.value??"";
+    if(isValid(validityChecker())){
+const newTask =toDoList.newItem(taskTitle.value,taskDescription.value,taskDueDate.value,taskPriority.value,taskProject.value,taskVal)
+addToList(newTask)
+}else{
+
+    return console.log("did not work")
+}
+
+})
 function renderList() {
     const list = toDoList.getList();
      list.map((task) => taskList.innerHTML +=`<div id="Task-Card-${task.id}" class="card">
@@ -124,10 +160,59 @@ function renderList() {
         </div>`)
 }
 
+addTaskBtn.addEventListener('click',(e)=>{
+e.preventDefault();
+taskCard.classList.remove("hidden");
+console.log("hey");
+toDoList.getProjects().forEach(function(project){
+const option = document.createElement("option");
+option.value = project;
+option.text=project;
+taskProject.appendChild(option);
 
+})});
 
-toDoList.newItem("  Cook.     .","Grill ribs and start rice cooker",'08-22-2024', 4)
-toDoList.newItem("Eat","Set Plate and chow down",'08-22-2024', 5, "Habits")
+taskList.addEventListener('click', function(event){
+        
+        const task = event.target.closest('button')
+        console.log(task.id)
+        const taskId=task.id.replace("Task-Deletion-", "")
+        console.log(taskId)
+
+        deleteListItem(taskId)
+        
+
+})
+function closeTaskForm() {
+  addTaskForm.reset();
+  taskProject.options.length=0;
+  taskCard.classList.add("hidden");
+}
+function removeFromList(taskID){
+    const div = document.getElementById(`Task-Card-${taskID}`)
+    console.log("removing from list")
+    return div.classList.add("hidden")
+}
+function addToList(task){
+    taskList.innerHTML +=`<div id="Task-Card-${task.id}" class="card">
+            <span id="Task-Title-${task.id}" class="cardItem"><strong>Title: </strong> ${task.title} </span>
+            <p id="Task-Description-${task.id}" class="cardItem"><strong>Description: </strong> ${task.description}</p>
+            <p id="Task-DueDate-${task.id}" class="cardItem"><strong>Due Date: </strong> ${task.dueDate} </p>
+            <p id="Task-Priority-${task.id}" class="cardItem"><strong>Priority: </strong> ${task.priority}</p>
+            <p id="Task-Project-${task.id}" class="cardItem"><strong>Project: </strong> ${task.project}</p>
+            <p id="Task-Completion-${task.id}" class="cardItem"><strong> Completed: </strong >${task.complete} </p>
+            <button id="Task-Deletion-${task.id}" > Delete Task</button>
+        </div>`
+}
+closeTaskFormBtn.addEventListener("click", closeTaskForm);
+
+// **** Controller/Handler ****
+function deleteListItem(taskID){
+    toDoList.deleteItem(taskID);
+    return removeFromList(taskID);
+}
+
+toDoList.newItem("  Cook.     .","Grill ribs and start rice cooker",'08-22-2024', 4,"Default",false)
+toDoList.newItem("Eat","Set Plate and chow down",'08-22-2024', 5, "Habits",true)
 toDoList.newItem("testingError","My priority is wrong",'08-22-2024', 90, "Habits")
-
 renderList();
