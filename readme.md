@@ -1,4 +1,4 @@
-# To Do This
+# To Do List
 
 A task management app built as part of The Odin Project. Users can create tasks, organize them by project, filter tasks by project, delete tasks, and persist data with `localStorage`.
 
